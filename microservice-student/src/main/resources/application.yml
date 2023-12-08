@@ -1,0 +1,29 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: msvc-student
+
+#este config sirve para evitar que tire error con el config server que no esta aun configurado
+  config:
+    import: optional:configserver:http://localhost:8888
+
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://localhost:1433; databaseName=studentsDB; trustServerCertificate=true
+    username: sa
+    password: 1234
+
+  # JPA specific configs
+  jpa:
+    hibernate:
+      ddl-auto: create
+    database: sql_server
+    database-platform: org.hibernate.dialect.SQLServer2012Dialect
+
+eureka:
+  instance: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka

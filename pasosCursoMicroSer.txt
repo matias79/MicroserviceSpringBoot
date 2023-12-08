@@ -1,0 +1,107 @@
+1. Creacion del proyecto desde maven instalado: se copia el link desde la pagina de maven in 5 minutes y se pega en la raiz del proyecto desde cmd
+Nota: Cambiar el nombre del app micro como el que se desee
+2. borra  lo del buil para configurar  desde cero, borra las dependencias
+3. empieza a configurar los build
+<pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>3.1.2</version>
+        </plugin>
+      </plugins>
+</pluginManagement>
+4. configura las dependencias: en este pom solo ingesa las dependencias de lompbok
+para que todos los micro de este proyecto lo hereden o tengan
+
+5. agrega paquete pom debajo de etiqueta name
+  <packaging>pom</packaging>
+  esto sirve para indicar que sera un contenedor y no un proyecto de arraque
+
+6. ingresa la etiqueta parent o padre de spring framework que es elpadre de proyectos para el caso
+de uso spring boot lo ubica osteiror de la version
+practicamente esto me indica que este proyecto es hijo de spring framework
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.2.0</version>
+    <relativePath/> <!-- lookup parent from repository -->
+ </parent>
+7. se trabaja con arquitectura de microservicios
+para el ejemplo se trabaja con 5 microservicios y no con un monolito
+7.1 se crea microservicio gateway desde inizializer usa las dependencias lo descarga y descomprime dentro del proyecto padre
+ahi se puede ver dentro del proyecto en intellij, pero aun no se reconoce como hijo, toca configurar desde pom del proyecto hijo
+para ello se trae del padre:
+  <groupId>com.mycompany.app</groupId>
+  <artifactId>SpringMicroServices</artifactId>
+  <version>1.0-SNAPSHOT</version>
+y lo pega en el proyecto hijo en el pom en la etiqueta parem....remplaza el parent de spring framewor por lo que trae del padre
+seguidamente antes de propierties crea la etiqueta modules y module, ahi ya reconoce el pryecto hijo
+
+7.2 crea el microservicio eureka y hace lo mismo que el paso 7.1
+
+7.3 crea el tercer microservicio configServer
+
+8. Realiza la configuracion del propoerties de cada micro servicio
+empieza por el de eureka
+una vez configurado servidor eureka le pone el banner
+  config:
+    import: optional:configserver:http://localhost:8888
+ hace esto para que inicialmente al levantar el servidor de ureka no tire error
+
+@EnableEurekaServer la coloca en la clase principal para que reconozca ureca como servidor
+
+corre el proyecto con el puerto asignado  y se ve ya ureka
+
+8. Se crea el microservicio de estudiate y hace el banner lo pone como hijo y configura properties para conexion a base de datos
+9. Crea el micro courses configura el propierties.yml lo deja como hijo
+10. crea paquete entities para a sigar atributos a en student co sus anotaciones
+11. crea paquete de persistencia y una intefaz para hacer uso de jpa con una consulta o query propia de jpa o sql propia naativa
+12. crea las capas de service donde crea la interfaz con los metodos,y crea la implementacion
+13. crea la capa de controller para la entidad student
+14. hace punto 10 a 13 para entidad course
+15. Procede a comunicar los micro servicios. Para ellos se debe hacer por ptenciones hpp entre los micro a comunicar
+para el caso de student a course desde studen hace un getmaping con el metodo para el caso obtener coourse por id
+seguidamente desde microservicios course se debe :
+agregar una dependiencia
+<dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-openfeign</artifactId>
+    </dependency>
+luego se debe a la clase ppal agregar la anotacion @EnableFeignClients
+para qeu se pueda habilitar el cliente feig en el micro
+
+16. se debe configurar el cliente para ello se crea un paquete client y se agrega una interface studentClient
+en esta clase se crea una lista generaica se asigna un nombre y se hace la anotacion
+getmaping(nombre del metodo del para traer course)
+@FeignClient(name = "msvc-student", url="localhost:8090/api/student")
+public interface StudentClient {
+    @GetMapping("/serach-my-course/{idCourse}") //este es el metodo del controller del mircoservicio studentporque de ahi esque se solicita a course enviar un listado o traer el listado por id
+    List<?> findAllStudentByCourse();
+}  //toddo esto se hace desde la clase que envia osea course
+
+17. trabaja con los dto, de estudiante asiga las prppiedas los anotaciones
+y da el nombre a la clase de StudenDto, esta clase la lleva  a la list<> del metodo clienteStudent
+
+18. en el paquete de servicio de course en la inteface ICousrService crea un metodo
+seguidamente hace la implementacion
+en controller de course hahce el metodo getmaping de respuesta cuando se consuma el enpoind asigando al getmaping
+
+19. configuracion del micro servicio gateway
+
+20. finalmente configura el microservicion config, aca en yml se hace la configuraon y se agrega archivos llamados como cada micro servicio
+y en cada uno se deja la configuracion inicual del yml de cada uno, una vez establecido el archivo en el yml de cda uno se borra todo dejando solo el nombre
+y el import del puerto http:....
+crea un directorio lo llama configurations y ahi mete cada configuracion de yml de los microservicios
+
+
+
+
+
+
+
+
+
+
+
+30/11/2023 5:30 am
